@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+const CARET = "^"
+const PLUS = "+"
+const MINUS = "-"
+const MULTIPLY = "*"
+const DIVISION = "/"
+const LEFT_BRACKET = "("
+const RIGHT_BRACKET = ")"
+
 func stringIsValid(inputString string) bool {
 	const regex = `[0-9/\*\^\+\-\(\)]`
 	trimString := strings.TrimSpace(inputString)
@@ -40,30 +48,42 @@ func stringIsOperator(input string) bool {
 	return matched
 }
 
+func isPriorityHigher(a string, b string) bool {
+	if a == CARET && b != CARET {
+		return true
+	} else if (a == MULTIPLY || a == DIVISION) && b != MULTIPLY && b != DIVISION && b != CARET {
+		return true
+	} else {
+		return false
+	}
+}
+
 // translate string to special array
 func arrayFromString(input string) []string {
-	trimString := strings.TrimSpace(input)
-	sampleArray := strings.Split(trimString, "")
+	sampleArray := strings.Split(input, "")
 
 	var result []string
 
 	var temporary string = ""
-	for _, val := range sampleArray {
+	for i := 0; i < len(sampleArray); i++ {
+		val := sampleArray[i]
+		var nextVal string
+		if i != len(sampleArray)-1 {
+			nextVal = sampleArray[i+1]
+		} else {
+			nextVal = ""
+		}
+
 		if stringIsNumber(val) {
 			temporary = temporary + string(val)
-		} else if temporary != "" {
-			result = append(result, temporary)
-			result = append(result, val)
-			temporary = ""
+			if nextVal == "" || !stringIsNumber(nextVal) {
+				result = append(result, temporary)
+				temporary = ""
+			}
 		} else {
 			result = append(result, val)
 		}
 	}
-
-	if temporary != "" {
-		result = append(result, temporary)
-	}
-
 	return result
 }
 
@@ -87,22 +107,54 @@ func ExpressionToPostfix(input string) (string, error) {
 		if stringIsNumber(val) {
 			queue = append(queue, val)
 			// if element is number
-		} else if stringIsOperator(val) && (len(stack) == 0 || stack[len(stack)-1] == "(") {
-			stack = append(stack, val)
+		} else if stringIsOperator(val) {
 			// if element equals operator +-/*
-			// & stack is empty || stack have the last element - "("
+			if len(stack) == 0 || stack[len(stack)-1] == "(" {
+				stack = append(stack, val)
+				// & stack is empty || stack have the last element - "("
+			} else if len(stack) != 0 && isPriorityHigher(val, stack[len(stack)-1]) {
+				stack = append(stack, val)
+				// if input operator is higher than last in stack
+			} else if len(stack) != 0 && !isPriorityHigher(val, stack[len(stack)-1]) {
+				i := len(stack) - 1
+				for i >= 0 && (!isPriorityHigher(stack[len(stack)-1], val) || stack[len(stack)-1] != "(") {
+					x := stack[i]
+					stack = stack[:i]
+					queue = append(queue, x)
+					i--
+				}
+				stack = append(stack, val)
+				// if input operator is same or smaller priority than last in stack
+			}
+		} else if val == LEFT_BRACKET {
+			stack = append(stack, val)
+		} else if val == RIGHT_BRACKET {
+			i := len(stack) - 1
+			for i >= 0 && stack[len(stack)-1] != "(" {
+				x := stack[i]
+				stack = stack[:i]
+				queue = append(queue, x)
+				i--
+			}
+			if len(stack) != 0 {
+				stack = stack[:i]
+			}
 		}
-
-		// if input operator is higher than last in stack
-		// else if isHigherOperator()
 	}
 
-	fmt.Println(queue)
-	fmt.Println(stack)
+	i := len(stack) - 1
+	for len(stack) != 0 {
+		x := stack[i]
+		stack = stack[:i]
+		queue = append(queue, x)
+		i--
+	}
 
-	return "TODO", fmt.Errorf("TODO")
+	resultString := strings.Join(queue, " ")
+	fmt.Println(resultString)
+	return resultString, fmt.Errorf("TODO")
 }
 
 func main() {
-	ExpressionToPostfix("123-123+(322/122)/5")
+	ExpressionToPostfix("(123-123)^6*(56-22)")
 }
