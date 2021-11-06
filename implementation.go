@@ -128,6 +128,7 @@ func ExpressionToPostfix(input string) (string, error) {
 			}
 		} else if val == LEFT_BRACKET {
 			stack = append(stack, val)
+			// if input value === "("
 		} else if val == RIGHT_BRACKET {
 			i := len(stack) - 1
 			for i >= 0 && stack[len(stack)-1] != "(" {
@@ -139,6 +140,7 @@ func ExpressionToPostfix(input string) (string, error) {
 			if len(stack) != 0 {
 				stack = stack[:i]
 			}
+			// if input value === ")"
 		}
 	}
 
@@ -149,6 +151,7 @@ func ExpressionToPostfix(input string) (string, error) {
 		queue = append(queue, x)
 		i--
 	}
+	// push other stack elements into queue
 
 	resultString := strings.Join(queue, " ")
 	fmt.Println(resultString)
