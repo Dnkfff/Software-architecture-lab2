@@ -155,5 +155,5 @@ func ExpressionToPostfix(input string) (string, error) {
 
 	resultString := strings.Join(queue, " ")
 	fmt.Println(resultString)
-	return resultString, fmt.Errorf("TODO")
+	return resultString, nil
 }
