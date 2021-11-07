@@ -1,23 +1,48 @@
 package lab2
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "gopkg.in/check.v1"
 )
 
-func TestPrefixToPostfix(t *testing.T) {
-	res, err := PrefixToPostfix("+ 5 * - 4 2 3")
-	if assert.Nil(t, err) {
-		assert.Equal(t, "4 2 - 3 * 5 +", res)
-	}
+func Test(t *testing.T) { TestingT(t) }
+
+type TestSuite struct{}
+
+var _ = Suite(&TestSuite{})
+
+func (s *TestSuite) TestExpressionToPostfixSum(c *C) {
+	got, _ := ExpressionToPostfix("100+100")
+
+	c.Assert(got, Equals, "100 100 +")
 }
 
-func ExamplePrefixToPostfix() {
-	res, _ := PrefixToPostfix("+ 2 2")
-	fmt.Println(res)
+func (s *TestSuite) TestExpressionToPostfixMult(c *C) {
+	got, _ := ExpressionToPostfix("100*100")
+
+	c.Assert(got, Equals, "100 100 *")
+}
+
+func (s *TestSuite) TestExpressionToPostfixEmptyString(c *C) {
+	got, _ := ExpressionToPostfix("")
+
+	c.Assert(got, Equals, "")
+}
+
+func (s *TestSuite) TestExpressionToPostfixComplicated(c *C) {
+	got, _ := ExpressionToPostfix("(123-123)^6*(56-22)")
+
+	c.Assert(got, Equals, "123 123 - 6 ^ 56 22 - *")
+	// Output:
+	// 123 123 - 6 ^ 56 22 - *
+}
+
+func (s *TestSuite) TestExpressionToPostfixComplicated2(c *C) {
+	got, _ := ExpressionToPostfix("5+(4-2)*3")
+
+	c.Assert(got, Equals, "5 4 2 - 3 * +")
 
 	// Output:
-	// 2 2 +
+	// 5 4 2 - 3 * +
 }
