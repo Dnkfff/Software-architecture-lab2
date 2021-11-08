@@ -19,9 +19,9 @@ func (s *TestSuite) TestExpressionToPostfixSum(c *C) {
 }
 
 func (s *TestSuite) TestExpressionToPostfixMult(c *C) {
-	got, _ := ExpressionToPostfix("100*100")
+	got, _ := ExpressionToPostfix("100*100+2")
 
-	c.Assert(got, Equals, "100 100 *")
+	c.Assert(got, Equals, "100 100 * 2 +")
 }
 
 func (s *TestSuite) TestExpressionToPostfixEmptyString(c *C) {
@@ -38,7 +38,13 @@ func (s *TestSuite) TestExpressionToPostfixComplicated(c *C) {
 	// 123 123 - 6 ^ 56 22 - *
 }
 
-func (s *TestSuite) TestExpressionToPostfixComplicated2(c *C) {
+func (s *TestSuite) TestExpressionToPostfix1(c *C) {
+	got, _ := ExpressionToPostfix("(100*100)+(2*4)(3+2))")
+
+	c.Assert(got, Equals, "100 100 * 2 4 * 3 2 + +")
+}
+
+func (s *TestSuite) TestExpressionToPostfix2(c *C) {
 	got, _ := ExpressionToPostfix("5+(4-2)*3")
 
 	c.Assert(got, Equals, "5 4 2 - 3 * +")

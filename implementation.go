@@ -1,6 +1,7 @@
 package lab2
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -91,8 +92,13 @@ func ExpressionToPostfix(input string) (string, error) {
 
 	// check if string is correct
 	stringIsValid := stringIsValid(input)
+
+	if input == "" || input == " " {
+		return "", errors.New("empty string")
+	}
+
 	if !stringIsValid {
-		return "_", fmt.Errorf("The string is invalid")
+		return "_", fmt.Errorf("the string is invalid")
 	}
 
 	// algoritm start
