@@ -90,8 +90,6 @@ func arrayFromString(input string) []string {
 
 func ExpressionToPostfix(input string) (string, error) {
 
-	mistake()
-
 	// check if string is correct
 	stringIsValid := stringIsValid(input)
 
